@@ -1,3 +1,13 @@
 <resources>
     <string name="app_name">FoodHub</string>
+    <string name="welcome_to">Welcome to</string>
+    <string name="foodHub">FoodHub</string>
+    <string name="your_favourite_foods_delivered">Your favourite foods delivered</string>
+    <string name="fast_at_your_door">fast at your door.</string>
+    <string name="already_have_an_account">Already have an account?</string>
+    <string name="sign_in">Sign In</string>
+    <string name="sign_in_with_email">Sign in with email</string>
+    <string name="google">GOOGLE</string>
+    <string name="facebook">FACEBOOK</string>
+    <string name="sign_in_with">Sign in with</string>
 </resources>
