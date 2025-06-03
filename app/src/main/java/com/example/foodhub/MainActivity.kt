@@ -7,17 +7,18 @@ import android.view.animation.OvershootInterpolator
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.animation.doOnEnd
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.navigation.NavController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.example.foodhub.ui.features.auth.AuthScreen
+import com.example.foodhub.ui.features.auth.login.LoginScreen
+import com.example.foodhub.ui.features.auth.signup.SignUpScreen
 import com.example.foodhub.ui.theme.FoodHubTheme
+import com.example.foodhub.util.NavRouts
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -70,10 +71,11 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
+
+            val navController = rememberNavController()
+
             FoodHubTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    AuthScreen(Modifier.padding(innerPadding))
-                }
+               AppNavigation()
             }
 
         }
@@ -86,17 +88,32 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
+fun AppNavigation() {
+    val navController = rememberNavController()
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    FoodHubTheme {
-        Greeting("Android")
+    NavHost(navController = navController, startDestination = NavRouts.AuthScreen.route) {
+        composable(NavRouts.AuthScreen.route) {
+            AuthScreen(
+                onSignInClick = {
+                    navController.navigate(NavRouts.LoginScreen.route)
+                }
+            )
+        }
+
+        composable(NavRouts.LoginScreen.route) {
+            LoginScreen(onBackClick = { navController.popBackStack() }, onSignUpClick = {
+                navController.navigate(
+                    NavRouts.SignUpScreen.route
+                )
+            })
+        }
+
+        composable(NavRouts.SignUpScreen.route) {
+            SignUpScreen(onLoginClick = {
+                navController.navigate(
+                    NavRouts.LoginScreen.route
+                )
+            })
+        }
     }
 }

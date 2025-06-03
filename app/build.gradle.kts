@@ -70,4 +70,10 @@ dependencies {
     implementation(libs.converter.gson)
     implementation(libs.logging.interceptor)
 
+    // google icons
+    implementation(libs.androidx.material.icons.extended.android)
+
+    // navigation
+    implementation(libs.androidx.navigation.compose)
+
 }
