@@ -3,8 +3,6 @@ package com.example.foodhub.ui.features.auth
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,17 +13,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -37,11 +32,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.foodhub.R
+import com.example.foodhub.ui.SocialButtons
 import com.example.foodhub.ui.theme.Orange
 
 
 @Composable
-fun AuthScreen(modifier: Modifier = Modifier) {
+fun AuthScreen(modifier: Modifier = Modifier, onSignInClick: () -> Unit) {
 
     val brush = Brush.verticalGradient(
         listOf(
@@ -50,7 +46,11 @@ fun AuthScreen(modifier: Modifier = Modifier) {
         )
     )
     Box(modifier = Modifier.fillMaxSize()) {
-        Image(painter = painterResource(R.drawable.ic_food_bg), contentDescription = null, modifier = Modifier.fillMaxSize())
+        Image(
+            painter = painterResource(R.drawable.ic_food_bg),
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize()
+        )
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -120,91 +120,11 @@ fun AuthScreen(modifier: Modifier = Modifier) {
 
             // -----sign in with-----
 
-            Text(
-                text = stringResource(R.string.sign_in_with),
-                modifier = Modifier
-                    .padding(vertical = 8.dp),
-                textAlign = TextAlign.Center,
-                fontSize = 16.sp,
+            SocialButtons(
+                onFacebookClick = {},
+                onGoogleClick = {},
                 color = Color.White
             )
-
-            // Google,FaceBook sign in Buttons
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 32.dp, vertical = 16.dp),
-            ) {
-
-                Row(
-                    modifier = Modifier
-                        .clickable {
-
-                        }
-                        .clip(shape = RoundedCornerShape(32.dp))
-                        .background(color = Color.White),
-                ) {
-
-                    Row(
-                        horizontalArrangement = Arrangement.Start,
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.padding(vertical = 10.dp, horizontal = 15.dp)
-                    ) {
-
-                        Image(
-                            painter = painterResource(R.drawable.ic_facebook),
-                            contentDescription = "Google icon"
-                        )
-
-                        Spacer(Modifier.width(10.dp))
-
-                        Text(
-                            text = stringResource(R.string.facebook),
-                            modifier = Modifier
-                                .padding(vertical = 8.dp),
-                            textAlign = TextAlign.Center,
-                            fontSize = 16.sp,
-                            color = Color.Black
-                        )
-                    }
-                }
-
-
-                Row(
-                    modifier = Modifier
-                        .clickable {
-
-                        }
-                        .clip(shape = RoundedCornerShape(32.dp))
-                        .background(color = Color.White),
-                ) {
-
-                    Row(
-                        horizontalArrangement = Arrangement.Start,
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.padding(vertical = 10.dp, horizontal = 15.dp)
-                    ) {
-
-                        Image(
-                            painter = painterResource(R.drawable.ic_google),
-                            contentDescription = "Google icon"
-                        )
-
-                        Spacer(Modifier.width(10.dp))
-
-                        Text(
-                            text = stringResource(R.string.google),
-                            modifier = Modifier
-                                .padding(vertical = 8.dp),
-                            textAlign = TextAlign.Center,
-                            fontSize = 16.sp,
-                            color = Color.Black
-                        )
-                    }
-                }
-            }
 
             // Sign In Button
             Button(
@@ -234,18 +154,20 @@ fun AuthScreen(modifier: Modifier = Modifier) {
 
                 Text(
                     text = stringResource(R.string.already_have_an_account),
-                    fontSize = 18.sp,
+                    fontSize = 14.sp,
                     color = Color.White,
                     fontWeight = FontWeight.Light
                 )
 
                 TextButton(
-                    onClick = {}
+                    onClick = {
+                        onSignInClick()
+                    }
                 ) {
 
                     Text(
                         text = stringResource(R.string.sign_in),
-                        fontSize = 18.sp,
+                        fontSize = 14.sp,
                         color = Color.White,
                         fontWeight = FontWeight.Light,
                         textDecoration = TextDecoration.Underline
@@ -262,5 +184,5 @@ fun AuthScreen(modifier: Modifier = Modifier) {
 @Preview(showBackground = true)
 @Composable
 fun AuthScreenPreview() {
-    AuthScreen()
+    AuthScreen(onSignInClick = {})
 }
