@@ -16,6 +16,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -32,17 +33,36 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.foodhub.R
 import com.example.foodhub.ui.LabeledTextField
 import com.example.foodhub.ui.SocialButtons
 import com.example.foodhub.ui.theme.Orange
 
 @Composable
-fun SignUpScreen(onLoginClick : ()-> Unit) {
+fun SignUpScreen(onLoginClick: () -> Unit, viewModel: SignUpViewModel = hiltViewModel()) {
 
-    var name by remember { mutableStateOf("") }
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
+    val name = viewModel.fullName.collectAsStateWithLifecycle()
+    val email = viewModel.email.collectAsStateWithLifecycle()
+    val password = viewModel.password.collectAsStateWithLifecycle()
+
+    val uiState = viewModel.uiState.collectAsState()
+    when(uiState.value){
+        SignUpViewModel.SignupEvents.Failure -> {
+            // show a toast message
+        }
+        SignUpViewModel.SignupEvents.Idle -> {
+            // Do Nothing
+        }
+        SignUpViewModel.SignupEvents.Loading -> {
+            // Loading Indicator
+        }
+        SignUpViewModel.SignupEvents.Success -> {
+            // Navigate to Home Screen
+        }
+    }
+
 
     Box(modifier = Modifier.fillMaxSize()) {
         androidx.compose.foundation.Image(
@@ -70,8 +90,8 @@ fun SignUpScreen(onLoginClick : ()-> Unit) {
 
             LabeledTextField(
                 title = stringResource(R.string.full_name),
-                value = name,
-                onValueChange = { name = it },
+                value = name.value,
+                onValueChange = { viewModel.onNameChange(it) },
                 isPassword = false,
                 modifier = Modifier
             )
@@ -80,8 +100,8 @@ fun SignUpScreen(onLoginClick : ()-> Unit) {
 
             LabeledTextField(
                 title = stringResource(R.string.email),
-                value = email,
-                onValueChange = { email = it },
+                value = email.value,
+                onValueChange = { viewModel.onEmailChange(it) },
                 isPassword = false,
                 modifier = Modifier
             )
@@ -90,8 +110,8 @@ fun SignUpScreen(onLoginClick : ()-> Unit) {
 
             LabeledTextField(
                 title = stringResource(R.string.password),
-                value = password,
-                onValueChange = { password = it },
+                value = password.value,
+                onValueChange = { viewModel.onPasswordChange(it) },
                 isPassword = true,
                 modifier = Modifier
             )
@@ -100,7 +120,7 @@ fun SignUpScreen(onLoginClick : ()-> Unit) {
 
             Button(
                 onClick = {
-
+                    viewModel::onSignUpClick
                 },
                 modifier = Modifier
                     .padding(horizontal = 36.dp, vertical = 16.dp)
