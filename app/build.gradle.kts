@@ -1,10 +1,8 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.kotlin.compose)
-    id("com.google.devtools.ksp")
+    alias(libs.plugins.ksp)
     id("com.google.dagger.hilt.android")
-
 }
 
 android {
@@ -31,11 +29,14 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "17"
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.4"
     }
     buildFeatures {
         compose = true
@@ -61,7 +62,7 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation(libs.androidx.core.splashscreen)
 
-    //hiltAdd commentMore actions
+    // Hilt
     implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler)
 
@@ -75,5 +76,7 @@ dependencies {
 
     // navigation
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.hilt.navigation.compose)
 
+    implementation(libs.androidx.lifecycle.runtime.compose)
 }
