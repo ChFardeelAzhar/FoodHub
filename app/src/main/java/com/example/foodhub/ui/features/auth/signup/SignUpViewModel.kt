@@ -1,17 +1,22 @@
 package com.example.foodhub.ui.features.auth.signup
 
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.foodhub.data.FoodApi
+import com.example.foodhub.data.models.SignUpRequest
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class SignUpViewModel @Inject constructor(
     val foodApi: FoodApi
-) {
+) : ViewModel() {
 
     private var _uiState = MutableStateFlow<SignupEvents>(SignupEvents.Idle)
     val uiState = _uiState.asStateFlow()
@@ -42,12 +47,26 @@ class SignUpViewModel @Inject constructor(
 
     fun onSignUpClick() {
         _uiState.value = SignupEvents.Loading
+        viewModelScope.launch {
 
-        // Perform SignUp
-        _uiState.value = SignupEvents.Success
-        _uiState.value = SignupEvents.Loading
+            try {
+                val response = foodApi.signUp(
+                    SignUpRequest(
+                        name = _fullName.value,
+                        email = _email.value,
+                        password = _password.value
+                    )
+                )
+                if (response.token.isNotEmpty()) {
+                    // Perform SignUp
+                    _uiState.value = SignupEvents.Success
+                    _navEvents.emit(SignUpNavigationEvent.NavigateToHome)
+                }
+            } catch (e: Exception) {
+                _uiState.value = SignupEvents.Failure(e)
+            }
 
-        _navEvents.tryEmit(SignUpNavigationEvent.NavigateToHome)
+        }
     }
 
     sealed class SignUpNavigationEvent() {
@@ -59,6 +78,6 @@ class SignUpViewModel @Inject constructor(
         object Idle : SignupEvents()
         object Loading : SignupEvents()
         object Success : SignupEvents()
-        object Failure : SignupEvents()
+        data class Failure(val error: Throwable) : SignupEvents()
     }
 }
