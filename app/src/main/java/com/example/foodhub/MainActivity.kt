@@ -17,6 +17,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.foodhub.ui.features.auth.AuthScreen
 import com.example.foodhub.ui.features.auth.login.LoginScreen
 import com.example.foodhub.ui.features.auth.signup.SignUpScreen
+import com.example.foodhub.ui.features.home.HomeScreen
 import com.example.foodhub.ui.theme.FoodHubTheme
 import com.example.foodhub.util.NavRouts
 import dagger.hilt.android.AndroidEntryPoint
@@ -75,7 +76,7 @@ class MainActivity : ComponentActivity() {
             val navController = rememberNavController()
 
             FoodHubTheme {
-               AppNavigation()
+                AppNavigation()
             }
 
         }
@@ -101,19 +102,46 @@ fun AppNavigation() {
         }
 
         composable(NavRouts.LoginScreen.route) {
-            LoginScreen(onBackClick = { navController.popBackStack() }, onSignUpClick = {
-                navController.navigate(
-                    NavRouts.SignUpScreen.route
-                )
-            })
+            LoginScreen(
+                onBackClick = { navController.popBackStack() },
+                onSignUpClick = {
+                    navController.navigate(
+                        NavRouts.SignUpScreen.route
+                    ) {
+                        popUpTo(NavRouts.AuthScreen.route) { inclusive = false }
+                        launchSingleTop = true
+                    }
+                },
+                navigateToHome = {
+                    navController.navigate(NavRouts.HomeScreen.route){
+                        popUpTo(0)
+                    }
+                })
         }
 
         composable(NavRouts.SignUpScreen.route) {
-            SignUpScreen(onLoginClick = {
-                navController.navigate(
-                    NavRouts.LoginScreen.route
-                )
-            })
+            SignUpScreen(
+                onLoginClick = {
+                    navController.navigate(
+                        NavRouts.LoginScreen.route
+                    ) {
+                        popUpTo(NavRouts.LoginScreen.route) { inclusive = false }
+                        launchSingleTop = true
+                    }
+                },
+                navigateToHome = {
+                    navController.navigate(
+                        NavRouts.HomeScreen.route
+                    ) {
+                        popUpTo(NavRouts.LoginScreen.route) { inclusive = false }
+                        launchSingleTop = true
+                    }
+                }
+            )
+        }
+
+        composable(NavRouts.HomeScreen.route) {
+            HomeScreen(navController = navController)
         }
     }
 }

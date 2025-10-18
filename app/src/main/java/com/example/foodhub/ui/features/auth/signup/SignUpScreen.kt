@@ -56,7 +56,11 @@ import com.example.foodhub.ui.theme.Orange
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
-fun SignUpScreen(onLoginClick: () -> Unit, viewModel: SignUpViewModel = hiltViewModel()) {
+fun SignUpScreen(
+    onLoginClick: () -> Unit,
+    navigateToHome: () -> Unit,
+    viewModel: SignUpViewModel = hiltViewModel()
+) {
 
     val name = viewModel.fullName.collectAsStateWithLifecycle()
     val email = viewModel.email.collectAsStateWithLifecycle()
@@ -66,24 +70,27 @@ fun SignUpScreen(onLoginClick: () -> Unit, viewModel: SignUpViewModel = hiltView
     val errorMessage = remember { mutableStateOf<String?>(null) }
     val loading = remember { mutableStateOf(false) }
     val context = LocalContext.current
-    when (val state = uiState.value) {
 
-        is SignUpViewModel.SignupEvents.Loading -> {
-            // Loading Indicator
-            loading.value = true
-        }
+    LaunchedEffect(uiState.value) {
+        when (val state = uiState.value) {
 
-        is SignUpViewModel.SignupEvents.Failure -> {
-            loading.value = false
-            // show a toast message
-            errorMessage.value = state.error.message
-            Toast.makeText(context, state.error.message, Toast.LENGTH_SHORT).show()
+            is SignUpViewModel.SignupEvents.Loading -> {
+                // Loading Indicator
+                loading.value = true
+            }
 
-        }
+            is SignUpViewModel.SignupEvents.Failure -> {
+                loading.value = false
+                // show a toast message
+                errorMessage.value = state.error.message
+                Toast.makeText(context, state.error.message, Toast.LENGTH_SHORT).show()
 
-        else -> {
-            loading.value = false
-            errorMessage.value = null
+            }
+
+            else -> {
+                loading.value = false
+                errorMessage.value = null
+            }
         }
     }
 
@@ -93,6 +100,7 @@ fun SignUpScreen(onLoginClick: () -> Unit, viewModel: SignUpViewModel = hiltView
                 SignUpViewModel.SignUpNavigationEvent.NavigateToHome -> {
                     // show a toast message
                     Toast.makeText(context, "Navigate to home", Toast.LENGTH_SHORT).show()
+                    navigateToHome()
                 }
 
                 else -> {
@@ -251,5 +259,5 @@ fun SignUpScreen(onLoginClick: () -> Unit, viewModel: SignUpViewModel = hiltView
 @Preview(showBackground = true)
 @Composable
 private fun SignUpScreenPreview() {
-    SignUpScreen(onLoginClick = {})
+    SignUpScreen(onLoginClick = {}, navigateToHome = {})
 }

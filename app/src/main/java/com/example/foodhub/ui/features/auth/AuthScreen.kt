@@ -129,7 +129,7 @@ fun AuthScreen(modifier: Modifier = Modifier, onSignInClick: () -> Unit) {
             // Sign In Button
             Button(
                 onClick = {
-
+                    onSignInClick()
                 },
                 modifier = Modifier.padding(horizontal = 32.dp, vertical = 16.dp),
                 shape = RoundedCornerShape(32.dp),
