@@ -268,7 +268,9 @@ fun LoginScreen(
 
             SocialButtons(
                 onFacebookClick = {},
-                onGoogleClick = {}
+                onGoogleClick = {
+                    viewModel.onGoogleSignInClick(context)
+                }
             )
 
         }
