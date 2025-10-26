@@ -1,9 +1,14 @@
 package com.example.foodhub.ui.features.auth.signup
 
+import androidx.activity.ComponentActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.foodhub.data.FoodApi
+import com.example.foodhub.data.models.SignInRequest
 import com.example.foodhub.data.models.SignUpRequest
+import com.example.foodhub.ui.features.auth.BaseAuthViewModel
+import com.example.foodhub.ui.features.auth.login.SignInViewModel.SignInEvents
+import com.example.foodhub.ui.features.auth.login.SignInViewModel.SignInNavigationEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -15,8 +20,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SignUpViewModel @Inject constructor(
-    val foodApi: FoodApi
-) : ViewModel() {
+    override val foodApi: FoodApi
+) : BaseAuthViewModel(foodApi) {
 
     private var _uiState = MutableStateFlow<SignupEvents>(SignupEvents.Idle)
     val uiState = _uiState.asStateFlow()
@@ -66,6 +71,39 @@ class SignUpViewModel @Inject constructor(
                 _uiState.value = SignupEvents.Failure(e)
             }
 
+        }
+    }
+
+
+    fun onGoogleSignInClick(context: ComponentActivity) {
+        _uiState.value = SignupEvents.Loading
+        viewModelScope.launch {
+            initiateGoogleLogin(context)
+        }
+    }
+
+    fun onFacebookButtonClick(context: ComponentActivity) {
+        viewModelScope.launch {
+            initiateFacebook(context)
+        }
+    }
+
+    override fun onloading() {
+        _uiState.value = SignupEvents.Loading
+    }
+
+    override fun onFacebookError(error: String) {
+        _uiState.value = SignupEvents.Failure(Throwable(error))
+    }
+
+    override fun onGoogleError(error: String) {
+        _uiState.value = SignupEvents.Failure(Throwable(error))
+    }
+
+    override fun onSuccess(token: String) {
+        viewModelScope.launch {
+            _uiState.value = SignupEvents.Success
+            _navEvents.emit(SignUpNavigationEvent.NavigateToHome)
         }
     }
 

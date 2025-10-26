@@ -17,21 +17,28 @@ class GoogleAuthUiProvider {
     suspend fun signIn(
         credentialManager: CredentialManager,
         activityContext: Context
-    ): GoogleAccount {
+    ): GoogleAccount? {
 
-        val googleIdOption: GetGoogleIdOption = GetGoogleIdOption.Builder()
-            .setServerClientId(WEB_CLIENT_ID)
-            .build()
+        return try {
+            val googleIdOption: GetGoogleIdOption = GetGoogleIdOption.Builder()
+                .setServerClientId(WEB_CLIENT_ID)
+                .build()
 
+            val result = credentialManager.getCredential(
+                context = activityContext,
+                request = getCredentialRequest(),
+            ).credential
 
-        val result = credentialManager.getCredential(
-            context = activityContext,
-            request = getCredentialRequest(),
-        ).credential
-
-        return handleGoogleCredential(result)
-
-
+            handleGoogleCredential(result)
+        } catch (e: androidx.credentials.exceptions.GetCredentialException) {
+            // This happens when user cancels or there's an issue fetching credentials
+            Log.e("GoogleAuthUiProvider", "Sign-in cancelled or failed: ${e.message}")
+            null
+        } catch (e: Exception) {
+            // Any other unexpected error
+            Log.e("GoogleAuthUiProvider", "Unexpected error: ${e.message}")
+            null
+        }
     }
 
     private fun getCredentialRequest(): GetCredentialRequest {

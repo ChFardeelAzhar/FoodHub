@@ -1,6 +1,7 @@
 package com.example.foodhub.ui.features.auth.signup
 
 import android.widget.Toast
+import androidx.activity.ComponentActivity
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -245,10 +246,7 @@ fun SignUpScreen(
 
             Spacer(Modifier.height(25.dp))
 
-            SocialButtons(
-                onFacebookClick = {},
-                onGoogleClick = {}
-            )
+            SocialButtons(viewModel)
 
         }
 

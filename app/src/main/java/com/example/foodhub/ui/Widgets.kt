@@ -1,5 +1,6 @@
 package com.example.foodhub.ui
 
+import androidx.activity.ComponentActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -30,6 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -38,11 +40,18 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.foodhub.R
+import com.example.foodhub.ui.features.auth.BaseAuthViewModel
 import com.example.foodhub.ui.theme.Orange
 
 @Composable
-fun SocialButtons(onFacebookClick: () -> Unit, onGoogleClick: () -> Unit, color : Color= Color.Black) {
+fun SocialButtons(
+    viewModel: BaseAuthViewModel,
+    color: Color = Color.Black
+) {
+
+    val context = LocalContext.current
 
     Column(
         modifier = Modifier
@@ -87,7 +96,7 @@ fun SocialButtons(onFacebookClick: () -> Unit, onGoogleClick: () -> Unit, color 
             Row(
                 modifier = Modifier
                     .clickable {
-                        onFacebookClick()
+                        viewModel.onFacebookClick(context as ComponentActivity)
                     }
                     .clip(shape = RoundedCornerShape(32.dp))
                     .background(color = Color.White),
@@ -121,7 +130,7 @@ fun SocialButtons(onFacebookClick: () -> Unit, onGoogleClick: () -> Unit, color 
             Row(
                 modifier = Modifier
                     .clickable {
-                        onGoogleClick()
+                        viewModel.onGoogleClick(context as ComponentActivity)
                     }
                     .clip(shape = RoundedCornerShape(32.dp))
                     .background(color = Color.White),
@@ -177,8 +186,7 @@ fun LabeledTextField(
             value = value,
             onValueChange = onValueChange,
             modifier = Modifier
-                .fillMaxWidth()
-            ,
+                .fillMaxWidth(),
             shape = RoundedCornerShape(12.dp),
             singleLine = true,
             visualTransformation = if (isPassword && !passwordVisible) PasswordVisualTransformation() else VisualTransformation.None,
@@ -193,7 +201,7 @@ fun LabeledTextField(
                             imageVector = image,
                             contentDescription = "Toggle password visibility",
                             tint = Color.Gray.copy(alpha = 0.7f)
-                            )
+                        )
                     }
                 }
             },
@@ -210,11 +218,13 @@ fun LabeledTextField(
 @Preview(showBackground = true)
 @Composable
 fun SocialButtonsPreview() {
-    SocialButtons(onGoogleClick = {}, onFacebookClick = {})
+    SocialButtons(
+        viewModel = TODO()
+    )
 }
 
 
-@Preview(showBackground = true )
+@Preview(showBackground = true)
 @Composable
 fun LabeledTextFieldPreview() {
     LabeledTextField(

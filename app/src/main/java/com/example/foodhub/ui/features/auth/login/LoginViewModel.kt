@@ -1,18 +1,10 @@
 package com.example.foodhub.ui.features.auth.login
 
-import android.content.Context
-import android.util.Log
-import androidx.credentials.CredentialManager
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.foodhub.data.FoodApi
-import com.example.foodhub.data.auth.GoogleAuthUiProvider
-import com.example.foodhub.data.models.AuthResponse
-import com.example.foodhub.data.models.OAuthRequest
 import com.example.foodhub.data.models.SignInRequest
-import com.example.foodhub.data.models.SignUpRequest
+import com.example.foodhub.ui.features.auth.BaseAuthViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -20,12 +12,12 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+
 @HiltViewModel
 class SignInViewModel @Inject constructor(
-    val foodApi: FoodApi
-) : ViewModel() {
+    override val foodApi: FoodApi
+) : BaseAuthViewModel(foodApi) {
 
-    val googleAuthUiProvider = GoogleAuthUiProvider()
 
     private var _uiState = MutableStateFlow<SignInEvents>(SignInEvents.Idle)
     val uiState = _uiState.asStateFlow()
@@ -70,39 +62,25 @@ class SignInViewModel @Inject constructor(
         }
     }
 
-    fun onGoogleSignInClick(context: Context) {
+    override fun onloading() {
         _uiState.value = SignInEvents.Loading
+    }
+
+    override fun onFacebookError(error: String) {
+        _uiState.value = SignInEvents.Failure(Throwable(error))
+    }
+
+    override fun onGoogleError(error: String) {
+        _uiState.value = SignInEvents.Failure(Throwable(error))
+    }
+
+    override fun onSuccess(token: String) {
         viewModelScope.launch {
-            try {
-                val response = googleAuthUiProvider.signIn(
-                    credentialManager = CredentialManager.create(context),
-                    activityContext = context
-                )
-
-
-                if (response != null) {
-
-                    val request = OAuthRequest(
-                        token = response.token,
-                        provider = "google"
-                    )
-                    val res = foodApi.oAuthLogin(
-                        request = request
-                    )
-                    if (res.token.isNotEmpty()) {
-                        _uiState.value = SignInEvents.Success
-                        _navEvents.emit(SignInNavigationEvent.NavigateToHome)
-                    }
-                }
-            } catch (e: Exception) {
-                Log.d("FRDL", "onGoogleSignInClick: ${e.message.toString()}")
-                _uiState.value = SignInEvents.Failure(Throwable("Google Login Failed"))
-
-            }
-
-
+            _uiState.value = SignInEvents.Success
+            _navEvents.emit(SignInNavigationEvent.NavigateToHome)
         }
     }
+
 
     sealed class SignInNavigationEvent() {
         object NavigateToSignup : SignInNavigationEvent()

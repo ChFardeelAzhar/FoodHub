@@ -1,6 +1,7 @@
 package com.example.foodhub.ui.features.auth.login
 
 import android.widget.Toast
+import androidx.activity.ComponentActivity
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -78,6 +79,7 @@ fun LoginScreen(
 
             is SignInViewModel.SignInEvents.Idle -> {
                 // do nothing
+                loading.value = false
             }
 
             is SignInViewModel.SignInEvents.Loading -> {
@@ -110,7 +112,7 @@ fun LoginScreen(
                 }
 
                 else -> {
-
+                    loading.value = false
                 }
             }
         }
@@ -266,12 +268,7 @@ fun LoginScreen(
 
             Spacer(Modifier.height(25.dp))
 
-            SocialButtons(
-                onFacebookClick = {},
-                onGoogleClick = {
-                    viewModel.onGoogleSignInClick(context)
-                }
-            )
+            SocialButtons(viewModel)
 
         }
 

@@ -129,6 +129,9 @@ fun AppNavigation() {
             AuthScreen(
                 onSignInClick = {
                     navController.navigate(NavRouts.LoginScreen.route)
+                },
+                navigateToHome = {
+                    navController.navigate(NavRouts.HomeScreen.route)
                 }
             )
         }

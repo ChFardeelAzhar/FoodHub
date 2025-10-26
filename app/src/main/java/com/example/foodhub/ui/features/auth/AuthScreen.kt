@@ -1,5 +1,6 @@
 package com.example.foodhub.ui.features.auth
 
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -13,16 +14,24 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -31,13 +40,69 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.foodhub.R
 import com.example.foodhub.ui.SocialButtons
+import com.example.foodhub.ui.features.auth.login.SignInViewModel
 import com.example.foodhub.ui.theme.Orange
+import kotlinx.coroutines.flow.collectLatest
 
 
 @Composable
-fun AuthScreen(modifier: Modifier = Modifier, onSignInClick: () -> Unit) {
+fun AuthScreen(
+    onSignInClick: () -> Unit,
+    navigateToHome: () -> Unit,
+    viewModel: AuthScreenViewModel = hiltViewModel()
+) {
+
+    val uiState = viewModel.uiState.collectAsStateWithLifecycle()
+    var loading = remember { mutableStateOf(false) }
+    val context = LocalContext.current
+
+    LaunchedEffect(uiState.value) {
+
+        when (val state = uiState.value) {
+
+            is AuthScreenViewModel.AuthScreenEvents.Failure -> {
+                // show a toast Also a failure message
+                Toast.makeText(context, state.error.message, Toast.LENGTH_SHORT).show()
+                loading.value = false
+            }
+
+            AuthScreenViewModel.AuthScreenEvents.Idle -> {
+
+            }
+
+            AuthScreenViewModel.AuthScreenEvents.Loading -> {
+                // show loading indicator
+                loading.value = true
+            }
+
+            AuthScreenViewModel.AuthScreenEvents.Success -> {
+                // here we will show a toast or navigate our screen to home
+                Toast.makeText(context, "Navigate to Home", Toast.LENGTH_SHORT).show()
+                loading.value = false
+            }
+        }
+
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.navState.collectLatest { state ->
+            when (state) {
+                AuthScreenViewModel.AuthNavigationEvent.NavigateToHome -> {
+                    navigateToHome()
+                    loading.value = false
+                }
+
+                else -> {
+                    loading.value = false
+                }
+            }
+        }
+    }
+
 
     val brush = Brush.verticalGradient(
         listOf(
@@ -65,6 +130,7 @@ fun AuthScreen(modifier: Modifier = Modifier, onSignInClick: () -> Unit) {
             },
             colors = ButtonDefaults.buttonColors(containerColor = Color.White),
             modifier = Modifier
+                .statusBarsPadding()
                 .padding(16.dp)
                 .align(Alignment.TopEnd)
         ) {
@@ -121,8 +187,7 @@ fun AuthScreen(modifier: Modifier = Modifier, onSignInClick: () -> Unit) {
             // -----sign in with-----
 
             SocialButtons(
-                onFacebookClick = {},
-                onGoogleClick = {},
+                viewModel = viewModel,
                 color = Color.White
             )
 
@@ -178,11 +243,16 @@ fun AuthScreen(modifier: Modifier = Modifier, onSignInClick: () -> Unit) {
         }
     }
 
+    if (loading.value) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            CircularProgressIndicator(color = Orange, strokeCap = StrokeCap.Round)
+        }
+    }
 
 }
 
 @Preview(showBackground = true)
 @Composable
 fun AuthScreenPreview() {
-    AuthScreen(onSignInClick = {})
+    AuthScreen(onSignInClick = {}, navigateToHome = {})
 }
